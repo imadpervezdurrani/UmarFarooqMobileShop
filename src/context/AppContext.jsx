@@ -242,6 +242,7 @@ export const AppProvider = ({ children }) => {
   const isAdmin = currentUser?.role === 'admin';
 
   // ----------------------------------------------------
+  // ----------------------------------------------------
   // PRODUCT & INVENTORY ACTIONS
   // ----------------------------------------------------
   const addProduct = async (prodData) => {
@@ -252,7 +253,11 @@ export const AppProvider = ({ children }) => {
       purchasePrice: parseFloat(prodData.purchasePrice) || 0,
       salePrice: parseFloat(prodData.salePrice) || 0,
       minStockLimit: parseInt(prodData.minStockLimit, 10) || 2,
+      createdAt: new Date().toISOString(),
     };
+
+    // Instant UI state update
+    setProducts((prev) => [newProduct, ...prev]);
 
     try {
       const res = await fetch(`${API_BASE_URL}/products`, {
@@ -263,20 +268,24 @@ export const AppProvider = ({ children }) => {
 
       if (res.ok) {
         const body = await res.json();
-        fetchAllDataFromBackend();
-        showToast(`Product "${body.data?.brand || newProduct.brand} ${body.data?.model || newProduct.model}" added to Database!`);
-        return body.data || newProduct;
+        const savedProd = body.data || newProduct;
+        setProducts((prev) => prev.map((p) => (p.id === newProduct.id ? savedProd : p)));
+        showToast(`Product "${savedProd.brand} ${savedProd.model}" saved to Database!`);
+        return savedProd;
       }
     } catch (err) {
       console.error('API Error adding product:', err);
     }
 
-    setProducts((prev) => [newProduct, ...prev]);
     showToast(`Product "${newProduct.brand} ${newProduct.model}" added!`);
     return newProduct;
   };
 
   const updateProduct = async (id, updatedFields) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updatedFields } : p))
+    );
+
     try {
       const res = await fetch(`${API_BASE_URL}/products`, {
         method: 'PUT',
@@ -284,7 +293,6 @@ export const AppProvider = ({ children }) => {
         body: JSON.stringify({ id, ...updatedFields }),
       });
       if (res.ok) {
-        fetchAllDataFromBackend();
         showToast('Product updated successfully in Database!');
         return;
       }
@@ -292,9 +300,6 @@ export const AppProvider = ({ children }) => {
       console.error('API Error updating product:', err);
     }
 
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updatedFields } : p))
-    );
     showToast('Product updated!');
   };
 
@@ -304,13 +309,14 @@ export const AppProvider = ({ children }) => {
       return false;
     }
 
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+
     try {
       const res = await fetch(`${API_BASE_URL}/products?id=${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });
       if (res.ok) {
-        setProducts((prev) => prev.filter((p) => p.id !== id));
         showToast('Deleted product from Database', 'warning');
         return true;
       }
@@ -318,7 +324,6 @@ export const AppProvider = ({ children }) => {
       console.error('API Error deleting product:', err);
     }
 
-    setProducts((prev) => prev.filter((p) => p.id !== id));
     showToast('Deleted product', 'warning');
     return true;
   };

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { store, saveDB, connectDB } from '@/lib/db';
+import { store, connectDB, loadCollection, saveDocument, deleteDocument } from '@/lib/db';
 
 export async function GET() {
   await connectDB();
-  return NextResponse.json({ success: true, data: store.products || [] });
+  const products = await loadCollection('products');
+  return NextResponse.json({ success: true, data: products || [] });
 }
 
 export async function POST(req) {
@@ -16,8 +17,7 @@ export async function POST(req) {
     if (!store.products) store.products = [];
     store.products.unshift(newProduct);
 
-    if (!store.stock_transactions) store.stock_transactions = [];
-    store.stock_transactions.unshift({
+    const stockEntry = {
       id: `st-${Date.now()}`,
       productId: newProduct.id,
       productName: `${newProduct.brand || ''} ${newProduct.model || ''}`.trim() || newProduct.name,
@@ -28,9 +28,14 @@ export async function POST(req) {
       reference: 'Product Creation',
       date: new Date().toISOString().split('T')[0],
       createdAt: new Date().toISOString(),
-    });
+    };
 
-    await saveDB();
+    if (!store.stock_transactions) store.stock_transactions = [];
+    store.stock_transactions.unshift(stockEntry);
+
+    await saveDocument('products', newProduct);
+    await saveDocument('stock_transactions', stockEntry);
+
     return NextResponse.json({ success: true, data: newProduct, message: 'Product created successfully' }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
@@ -48,7 +53,7 @@ export async function PUT(req) {
     if (index === -1) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
 
     store.products[index] = { ...store.products[index], ...body, updatedAt: new Date().toISOString() };
-    await saveDB();
+    await saveDocument('products', store.products[index]);
     return NextResponse.json({ success: true, data: store.products[index], message: 'Product updated successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
@@ -66,7 +71,7 @@ export async function DELETE(req) {
     if (index === -1) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
 
     const deleted = store.products.splice(index, 1)[0];
-    await saveDB();
+    await deleteDocument('products', id);
     return NextResponse.json({ success: true, data: deleted, message: 'Product deleted successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
