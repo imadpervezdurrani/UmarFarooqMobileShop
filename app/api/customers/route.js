@@ -22,7 +22,7 @@ export async function POST(req) {
 
     if (!store.customers) store.customers = [];
     store.customers.unshift(newCust);
-    saveDB();
+    await saveDB();
 
     return NextResponse.json({ success: true, data: newCust, message: 'Customer created successfully' }, { status: 201 });
   } catch (err) {
@@ -69,7 +69,7 @@ export async function PUT(req) {
       Object.assign(cust, body);
     }
 
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: cust, message: 'Customer updated successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
@@ -87,7 +87,7 @@ export async function DELETE(req) {
     if (index === -1) return NextResponse.json({ success: false, message: 'Customer not found' }, { status: 404 });
 
     const deleted = store.customers.splice(index, 1)[0];
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: deleted, message: 'Customer deleted successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });

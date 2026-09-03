@@ -15,7 +15,7 @@ export async function POST(req) {
 
     if (!store.invoices) store.invoices = [];
     store.invoices.unshift(newInv);
-    saveDB();
+    await saveDB();
 
     return NextResponse.json({ success: true, data: newInv, message: 'Invoice saved' }, { status: 201 });
   } catch (err) {

@@ -37,7 +37,7 @@ export async function POST(req) {
 
     if (!store.users) store.users = [];
     store.users.push(newUser);
-    saveDB();
+    await saveDB();
 
     const { password: p, ...safe } = newUser;
     return NextResponse.json({ success: true, data: safe, message: 'User created' }, { status: 201 });

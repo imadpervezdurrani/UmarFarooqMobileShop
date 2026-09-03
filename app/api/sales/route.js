@@ -100,7 +100,7 @@ export async function POST(req) {
       }
     }
 
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: newSale, message: `Invoice ${newSale.invoiceNo} created successfully` }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });

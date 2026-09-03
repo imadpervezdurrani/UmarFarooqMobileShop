@@ -30,7 +30,7 @@ export async function POST(req) {
       createdAt: new Date().toISOString(),
     });
 
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: newProduct, message: 'Product created successfully' }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
@@ -48,7 +48,7 @@ export async function PUT(req) {
     if (index === -1) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
 
     store.products[index] = { ...store.products[index], ...body, updatedAt: new Date().toISOString() };
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: store.products[index], message: 'Product updated successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
@@ -66,7 +66,7 @@ export async function DELETE(req) {
     if (index === -1) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
 
     const deleted = store.products.splice(index, 1)[0];
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: deleted, message: 'Product deleted successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });

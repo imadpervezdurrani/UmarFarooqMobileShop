@@ -22,7 +22,7 @@ export async function POST(req) {
 
     if (!store.suppliers) store.suppliers = [];
     store.suppliers.unshift(newSupp);
-    saveDB();
+    await saveDB();
 
     return NextResponse.json({ success: true, data: newSupp, message: 'Supplier created successfully' }, { status: 201 });
   } catch (err) {
@@ -86,7 +86,7 @@ export async function PUT(req) {
       Object.assign(supp, body);
     }
 
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: supp, message: 'Supplier updated successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
@@ -104,7 +104,7 @@ export async function DELETE(req) {
     if (index === -1) return NextResponse.json({ success: false, message: 'Supplier not found' }, { status: 404 });
 
     const deleted = store.suppliers.splice(index, 1)[0];
-    saveDB();
+    await saveDB();
     return NextResponse.json({ success: true, data: deleted, message: 'Supplier deleted successfully' });
   } catch (err) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });

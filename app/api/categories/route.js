@@ -15,7 +15,7 @@ export async function POST(req) {
 
     if (!store.categories) store.categories = [];
     store.categories.push(newCat);
-    saveDB();
+    await saveDB();
 
     return NextResponse.json({ success: true, data: newCat, message: 'Category added' }, { status: 201 });
   } catch (err) {
