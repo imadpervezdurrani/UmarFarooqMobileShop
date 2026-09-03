@@ -1,0 +1,30 @@
+{
+  "name": "omarfarooq",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Umar Farooq Mobile Zone - Shop Management System",
+  "author": "Umar Farooq Mobile Zone",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.39.0",
+    "mongoose": "^8.9.0",
+    "next": "^15.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
+  }
+}
